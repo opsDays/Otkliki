@@ -1,0 +1,15 @@
+const fs=require('node:fs'),path=require('node:path');
+if(process.platform!=='win32')throw Error('Run this Windows packaging command on Windows. Use npm start on macOS.');
+const root=path.resolve(__dirname,'..');
+const runtime=path.dirname(require('electron'));
+const destination=path.join(root,'dist','Otkliki-Portable-1.4');
+if(fs.existsSync(destination))throw Error('Output folder already exists. Move it elsewhere before building again; it may contain personal data.');
+fs.mkdirSync(path.dirname(destination),{recursive:true});
+fs.cpSync(runtime,destination,{recursive:true});
+fs.renameSync(path.join(destination,'electron.exe'),path.join(destination,'Otkliki.exe'));
+fs.cpSync(path.join(root,'app'),path.join(destination,'resources','app'),{recursive:true});
+fs.mkdirSync(path.join(destination,'data'));
+fs.copyFileSync(path.join(root,'LICENSE'),path.join(destination,'LICENSE-Otkliki.txt'));
+fs.copyFileSync(path.join(root,'THIRD_PARTY_NOTICES.md'),path.join(destination,'THIRD_PARTY_NOTICES.md'));
+console.log('Portable folder: '+destination);
+console.log('Keep the whole folder together. Personal data will be written to its data folder.');
